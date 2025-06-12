@@ -11,6 +11,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  setUser: (user: User | null) => void;
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
@@ -25,14 +26,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
-
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
+  
+    if (storedUser && storedUser !== "undefined") {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to parse stored user:", error);
+        localStorage.removeItem("user"); // Clear invalid data
+      }
+    } else {
+      console.warn("No valid user found in localStorage.");
+      localStorage.removeItem("user"); // Clean up if "undefined" was stored
+    }
+  
+    if (storedToken && storedToken !== "undefined") {
       setToken(storedToken);
+    } else {
+      console.warn("No valid token found in localStorage.");
+      localStorage.removeItem("token");
     }
   }, []);
 
   const login = (user: User, token: string) => {
+    console.log("Logging in user:", user);
     setUser(user);
     setToken(token);
     localStorage.setItem("user", JSON.stringify(user));
@@ -47,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -15,6 +15,7 @@ export default function Register() {
     e.preventDefault();
     try {
       const data = await register(name, email, password, role);
+      console.log("Registration data:", data);
     login(data.user, data.token);
       navigate('/dashboard');
     } catch (err) {
