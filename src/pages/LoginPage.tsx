@@ -43,13 +43,14 @@ export default function Login() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-[10px] bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <Input type="email" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <Input type="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         <Button type="submit">Login</Button>
         <Button
           type="button"
+          // className=''
           onClick={() => {
             const mockUser = {
               fullName: "Admin",
