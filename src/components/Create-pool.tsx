@@ -2,16 +2,15 @@ import { useForm } from "react-hook-form"
 import { useState } from "react"
 
 type LenderFormData = {
-  name: string
-  email: string
-  phone: string
-  company: string
-  licenseNumber: string
-  interestRate: number
-  terms: string
+    name: string
+    email: string
+    interestRate: number
+    terms: string
+    
 }
 
-export default function LenderForm() {
+
+  export default function LenderForm() {
   const {
     register,
     handleSubmit,
@@ -85,35 +84,7 @@ export default function LenderForm() {
         )}
       </div>
 
-      <div>
-        <label className="block mb-1">Phone</label>
-        <input
-          type="tel"
-          {...register("phone", {
-            required: "Phone is required",
-            pattern: {
-              value: /^[0-9]{10,15}$/,
-              message: "Enter a valid phone number",
-            },
-          })}
-          className="border px-3 py-2 w-full"
-        />
-        {errors.phone && (
-          <p className="text-red-500 text-sm">{errors.phone.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block mb-1">Company</label>
-        <input
-          type="text"
-          {...register("company", { required: "Company name is required" })}
-          className="border px-3 py-2 w-full"
-        />
-        {errors.company && (
-          <p className="text-red-500 text-sm">{errors.company.message}</p>
-        )}
-      </div>
+      
 
       <div>
         <label className="block mb-1">Interest Rate</label>
@@ -144,23 +115,6 @@ export default function LenderForm() {
         )}
       </div>
 
-      <div>
-        <label className="block mb-1">License Number</label>
-        <input
-          type="text"
-          {...register("licenseNumber", {
-            required: "License number is required",
-            minLength: {
-              value: 5,
-              message: "License number must be at least 5 characters",
-            },
-          })}
-          className="border px-3 py-2 w-full"
-        />
-        {errors.licenseNumber && (
-          <p className="text-red-500 text-sm">{errors.licenseNumber.message}</p>
-        )}
-      </div>
 
       <button
         type="submit"
