@@ -12,34 +12,69 @@ const LenderDashboard = () => {
   }
 
   return (
-    <div className="p-6">
-      <h2 className="text-xl font-bold">Dashboard</h2>
-      <p className="mb-4">
-        You are logged in as: <span className="font-semibold">{role}</span>
-      </p>
+    <div className="min-h-screen bg-blue-50 py-10 px-4">
+      <div className="max-w-5xl mx-auto">
+        <header className="mb-8 text-center">
+          <h2 className="text-4xl font-bold text-blue-700">Lender Dashboard</h2>
+          <p className="text-blue-900 mt-1">
+            Logged in as:{" "}
+            <span className="font-semibold capitalize">{role}</span>
+          </p>
+        </header>
 
-      {role === "lender" ? (
-        <div>
-          <Link to="/profile" className="text-blue-600 underline">
-            Go to Profile
-          </Link>
-          <p>Overview of pools, contributions, and earnings will be here.</p>
+        {role === "lender" ? (
+          <section className="space-y-8">
+            {/* Overview Card */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-blue-100">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-blue-800">
+                  Your Overview
+                </h3>
+                <Link
+                  to="/profile"
+                  className="text-blue-600 hover:underline font-medium text-sm"
+                >
+                  Go to Profile
+                </Link>
+              </div>
+              <p className="text-blue-900">
+                Overview of pools, contributions, and earnings will be displayed
+                here.
+              </p>
+            </div>
 
-          <Button
-            onClick={poolOpenForm}
-            className="mt-4 bg-blue-500 hover:bg-blue-600 text-white p-4 rounded font-bold cursor-pointer"
-          >
-            {openForm ? "Close Pool Form" : "Create New Pool"}
-          </Button>
+            {/* Pool Management Card */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-blue-100">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-blue-800">
+                  Pool Management
+                </h3>
+                <Button
+                  onClick={poolOpenForm}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition"
+                >
+                  {openForm ? "Close Pool Form" : "Create New Pool"}
+                </Button>
+              </div>
 
-          {openForm && <LenderForm />}
-        </div>
-      ) : (
-        <div>
-          <h3 className="text-lg font-semibold">Admin Dashboard</h3>
-          <p>Manage users, pools, and platform settings here.</p>
-        </div>
-      )}
+              {openForm && (
+                <div className="mt-6 border-t border-blue-100 pt-6">
+                  <LenderForm />
+                </div>
+              )}
+            </div>
+          </section>
+        ) : (
+          <section className="bg-white rounded-xl shadow-md p-6 border border-blue-100">
+            <h3 className="text-xl font-semibold text-blue-800">
+              Admin Dashboard
+            </h3>
+            <p className="text-blue-900">
+              Manage users, pools, and platform settings here.
+            </p>
+          </section>
+        )}
+      </div>
     </div>
   )
 }

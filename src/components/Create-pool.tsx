@@ -1,12 +1,13 @@
 import { useForm } from "react-hook-form"
 import { useState } from "react"
+import { FiInfo, FiCheckCircle, FiAlertCircle } from "react-icons/fi"
 
 type PoolFormData = {
   name: string
   interestRate: number
   minAmount: number
   maxAmount: number
-  durationInMonths: number
+  description: string
 }
 
 export default function LenderForm() {
@@ -27,9 +28,7 @@ export default function LenderForm() {
 
       const response = await fetch("http://localhost:5000/api/pools", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
 
@@ -46,98 +45,210 @@ export default function LenderForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="space-y-4 max-w-md mx-auto"
-    >
-      {apiError && <p className="text-red-500">{apiError}</p>}
-      {successMessage && <p className="text-green-600">{successMessage}</p>}
-
-      <div>
-        <label className="block mb-1">Pool Name</label>
-        <input
-          type="text"
-          {...register("name", { required: "Pool name is required" })}
-          className="border px-3 py-2 w-full"
-        />
-        {errors.name && (
-          <p className="text-red-500 text-sm">{errors.name.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block mb-1">Interest Rate (%)</label>
-        <input
-          type="number"
-          step="0.1"
-          {...register("interestRate", {
-            required: "Interest rate is required",
-            min: { value: 0, message: "Must be at least 0" },
-            max: { value: 100, message: "Must be 100 or less" },
-          })}
-          className="border px-3 py-2 w-full"
-        />
-        {errors.interestRate && (
-          <p className="text-red-500 text-sm">{errors.interestRate.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block mb-1">Minimum Amount</label>
-        <input
-          type="number"
-          {...register("minAmount", {
-            required: "Minimum amount is required",
-            min: { value: 0, message: "Must be at least 0" },
-          })}
-          className="border px-3 py-2 w-full"
-        />
-        {errors.minAmount && (
-          <p className="text-red-500 text-sm">{errors.minAmount.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block mb-1">Maximum Amount</label>
-        <input
-          type="number"
-          {...register("maxAmount", {
-            required: "Maximum amount is required",
-            validate: (value, formValues) =>
-              value >= formValues.minAmount ||
-              "Must be greater than or equal to Min Amount",
-          })}
-          className="border px-3 py-2 w-full"
-        />
-        {errors.maxAmount && (
-          <p className="text-red-500 text-sm">{errors.maxAmount.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block mb-1">Duration (months)</label>
-        <input
-          type="number"
-          {...register("durationInMonths", {
-            required: "Duration is required",
-            min: { value: 1, message: "Must be at least 1 month" },
-          })}
-          className="border px-3 py-2 w-full"
-        />
-        {errors.durationInMonths && (
-          <p className="text-red-500 text-sm">
-            {errors.durationInMonths.message}
-          </p>
-        )}
-      </div>
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+    <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="bg-white shadow-xl p-8 rounded-2xl w-full max-w-2xl space-y-6 border border-blue-100"
       >
-        {isSubmitting ? "Submitting..." : "Submit"}
-      </button>
-    </form>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-bold text-blue-800">Create New Pool</h2>
+          <p className="text-blue-600/80">
+            Fill in the details below to create a new lending pool
+          </p>
+        </div>
+
+        {apiError && (
+          <div className="flex items-start gap-3 bg-red-50/80 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <FiAlertCircle className="flex-shrink-0 mt-0.5 text-red-500" />
+            <p>{apiError}</p>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="flex items-start gap-3 bg-blue-50/80 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
+            <FiCheckCircle className="flex-shrink-0 mt-0.5 text-blue-500" />
+            <p>{successMessage}</p>
+          </div>
+        )}
+
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-blue-800 mb-1">
+              Pool Name <span className="text-blue-600">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                {...register("name", { required: "Pool name is required" })}
+                className={`block w-full px-4 py-2.5 rounded-lg border ${
+                  errors.name ? "border-red-300" : "border-blue-200"
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-300/60`}
+                placeholder="e.g., Premium Lending Pool"
+              />
+            </div>
+            {errors.name && (
+              <p className="mt-1.5 flex items-center gap-1 text-sm text-red-600">
+                <FiInfo className="flex-shrink-0" />
+                {errors.name.message}
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-blue-800 mb-1">
+                Interest Rate (%) <span className="text-blue-600">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  step="0.1"
+                  {...register("interestRate", {
+                    required: "Interest rate is required",
+                    min: { value: 0, message: "Must be at least 0" },
+                    max: { value: 100, message: "Must be 100 or less" },
+                  })}
+                  className={`block w-full px-4 py-2.5 rounded-lg border ${
+                    errors.interestRate ? "border-red-300" : "border-blue-200"
+                  } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-300/60`}
+                  placeholder="e.g., 5.5"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-blue-400">
+                  %
+                </div>
+              </div>
+              {errors.interestRate && (
+                <p className="mt-1.5 flex items-center gap-1 text-sm text-red-600">
+                  <FiInfo className="flex-shrink-0" />
+                  {errors.interestRate.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-blue-800 mb-1">
+                Minimum Amount <span className="text-blue-600">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  {...register("minAmount", {
+                    required: "Minimum amount is required",
+                    min: { value: 0, message: "Must be at least 0" },
+                  })}
+                  className={`block w-full px-4 py-2.5 rounded-lg border ${
+                    errors.minAmount ? "border-red-300" : "border-blue-200"
+                  } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-300/60`}
+                  placeholder="e.g., 1000"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-blue-400">
+                  USD
+                </div>
+              </div>
+              {errors.minAmount && (
+                <p className="mt-1.5 flex items-center gap-1 text-sm text-red-600">
+                  <FiInfo className="flex-shrink-0" />
+                  {errors.minAmount.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-blue-800 mb-1">
+                Maximum Amount <span className="text-blue-600">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  {...register("maxAmount", {
+                    required: "Maximum amount is required",
+                    validate: (value, formValues) =>
+                      value >= formValues.minAmount ||
+                      "Must be greater than or equal to Min Amount",
+                  })}
+                  className={`block w-full px-4 py-2.5 rounded-lg border ${
+                    errors.maxAmount ? "border-red-300" : "border-blue-200"
+                  } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-300/60`}
+                  placeholder="e.g., 10000"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-blue-400">
+                  USD
+                </div>
+              </div>
+              {errors.maxAmount && (
+                <p className="mt-1.5 flex items-center gap-1 text-sm text-red-600">
+                  <FiInfo className="flex-shrink-0" />
+                  {errors.maxAmount.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-blue-800 mb-1">
+              Pool Description <span className="text-blue-600">*</span>
+            </label>
+            <textarea
+              {...register("description", {
+                required: "Description is required",
+                minLength: {
+                  value: 20,
+                  message: "Description must be at least 20 characters",
+                },
+              })}
+              rows={4}
+              placeholder="Describe the purpose, terms, and conditions of this pool..."
+              className={`block w-full px-4 py-2.5 rounded-lg border ${
+                errors.description ? "border-red-300" : "border-blue-200"
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-300/60`}
+            />
+            {errors.description && (
+              <p className="mt-1.5 flex items-center gap-1 text-sm text-red-600">
+                <FiInfo className="flex-shrink-0" />
+                {errors.description.message}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`w-full py-3 px-6 rounded-lg font-medium text-white transition-all ${
+            isSubmitting
+              ? "bg-blue-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 shadow-sm hover:shadow-md"
+          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+        >
+          {isSubmitting ? (
+            <span className="flex items-center justify-center gap-2">
+              <svg
+                className="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+              Creating Pool...
+            </span>
+          ) : (
+            "Create Pool"
+          )}
+        </button>
+      </form>
+    </div>
   )
 }
