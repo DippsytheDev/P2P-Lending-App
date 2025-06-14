@@ -4,10 +4,10 @@ import { FiInfo, FiCheckCircle, FiAlertCircle } from "react-icons/fi"
 
 type PoolFormData = {
   name: string
+  description: string
   interestRate: number
   minAmount: number
   maxAmount: number
-  description: string
 }
 
 export default function LenderForm() {
@@ -26,11 +26,17 @@ export default function LenderForm() {
       setApiError(null)
       setSuccessMessage(null)
 
-      const response = await fetch("http://localhost:5000/api/pools", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
+      const response = await fetch(
+        "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/create-pool",
+        {
+          method: "POST",
+            headers: {
+                "Content-Type": "application/json" ,
+                "Authorization": "Bearer " + localStorage.getItem("token") // Assuming token is stored in localStorage
+            },
+          body: JSON.stringify(data),
+        }
+      )
 
       if (!response.ok) {
         const errorData = await response.json()
@@ -90,6 +96,32 @@ export default function LenderForm() {
               <p className="mt-1.5 flex items-center gap-1 text-sm text-red-600">
                 <FiInfo className="flex-shrink-0" />
                 {errors.name.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-blue-800 mb-1">
+              Pool Description <span className="text-blue-600">*</span>
+            </label>
+            <textarea
+              {...register("description", {
+                required: "Description is required",
+                minLength: {
+                  value: 20,
+                  message: "Description must be at least 20 characters",
+                },
+              })}
+              rows={4}
+              placeholder="Describe the purpose, terms, and conditions of this pool..."
+              className={`block w-full px-4 py-2.5 rounded-lg border ${
+                errors.description ? "border-red-300" : "border-blue-200"
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-300/60`}
+            />
+            {errors.description && (
+              <p className="mt-1.5 flex items-center gap-1 text-sm text-red-600">
+                <FiInfo className="flex-shrink-0" />
+                {errors.description.message}
               </p>
             )}
           </div>
@@ -182,32 +214,6 @@ export default function LenderForm() {
                 </p>
               )}
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-blue-800 mb-1">
-              Pool Description <span className="text-blue-600">*</span>
-            </label>
-            <textarea
-              {...register("description", {
-                required: "Description is required",
-                minLength: {
-                  value: 20,
-                  message: "Description must be at least 20 characters",
-                },
-              })}
-              rows={4}
-              placeholder="Describe the purpose, terms, and conditions of this pool..."
-              className={`block w-full px-4 py-2.5 rounded-lg border ${
-                errors.description ? "border-red-300" : "border-blue-200"
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder-blue-300/60`}
-            />
-            {errors.description && (
-              <p className="mt-1.5 flex items-center gap-1 text-sm text-red-600">
-                <FiInfo className="flex-shrink-0" />
-                {errors.description.message}
-              </p>
-            )}
           </div>
         </div>
 
