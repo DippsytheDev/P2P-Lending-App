@@ -21,34 +21,87 @@ export default function LenderForm() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  const onSubmit = async (data: PoolFormData) => {
-    try {
-      setApiError(null)
-      setSuccessMessage(null)
+const onSubmit = async (data: PoolFormData) => {
+  try {
+    setApiError(null)
+    setSuccessMessage(null)
 
-      const response = await fetch(
-        "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/create-pool",
-        {
-          method: "POST",
+    const payload = {
+      name: data.name,
+      description: data.description,
+      interestRate: Number(data.interestRate),
+      minimumAmount: Number(data.minAmount),
+      maximumAmount: Number(data.maxAmount),
+    }
+
+    // Add this simple test before your main request
+    const testConnection = async () => {
+      try {
+        const response = await fetch("https://lendpool-api-web.onrender.com")
+        console.log("Server reachable:", response.status)
+      } catch (error) {
+        console.error("Server not reachable:", error)
+      }
+    }
+
+    // Call this before your form submission
+    testConnection()
+
+    // const response = await fetch(
+    //   "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/create-pool",
+    //   {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Authorization: "Bearer " + localStorage.getItem("token"),
+    //     },
+    //     body: JSON.stringify(payload),
+    //   }
+    // )
+
+      const createPool = () => {
+        return fetch(
+          "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/create-pool",
+          {
+            method: "POST",
             headers: {
-                "Content-Type": "application/json" ,
-                "Authorization": "Bearer " + localStorage.getItem("token") // Assuming token is stored in localStorage
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
             },
-          body: JSON.stringify(data),
-        }
-      )
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || "Failed to create pool.")
+            body: JSON.stringify(payload),
+          }
+        )
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok")
+            }
+            return response.json()
+          })
+          .then((data) => {
+            setSuccessMessage("Pool created successfully!")
+            reset()
+            return data
+          })
+          .catch((error) => {
+            setApiError(error.message || "Something went wrong.")
+          })
       }
 
-      setSuccessMessage("Pool created successfully!")
-      reset()
-    } catch (error: any) {
-      setApiError(error.message || "Something went wrong.")
+    const response = await createPool()
+    if (!response.ok) {
+      const errorData = await response.json()
+      throw new Error(errorData.message || "Failed to create pool.")
     }
+
+    setSuccessMessage("Pool created successfully!")
+    reset()
+  } catch (error: any) {
+    setApiError(error.message || "Something went wrong.")
   }
+    }
+    
+    // console.log(localStorage.getItem("token"))
+    
 
   return (
     <div className="min-h-screen bg-blue-50 flex items-center justify-center p-4">

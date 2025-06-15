@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function Register() {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<'lender' | 'borrower'>('borrower');
@@ -14,7 +15,7 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await register(name, email, password, role);
+      const data = await register(firstName, lastName, email, password, role);
       console.log("Registration data:", data);
     login(data.user, data.token);
       navigate('/dashboard');
@@ -25,16 +26,30 @@ export default function Register() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm"
+      >
         <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
 
         <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">Full Name</label>
+          <label className="block text-sm font-semibold mb-1">Last Name</label>
           <input
             type="text"
             className="w-full p-2 border rounded"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1">First Name</label>
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
             required
           />
         </div>
@@ -62,10 +77,12 @@ export default function Register() {
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">Register As</label>
+          <label className="block text-sm font-semibold mb-1">
+            Register As
+          </label>
           <select
             value={role}
-            onChange={(e) => setRole(e.target.value as 'lender' | 'borrower')}
+            onChange={(e) => setRole(e.target.value as "lender" | "borrower")}
             className="w-full p-2 border rounded"
           >
             <option value="lender">Lender</option>
@@ -81,5 +98,5 @@ export default function Register() {
         </button>
       </form>
     </div>
-  );
+  )
 }

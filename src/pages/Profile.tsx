@@ -1,46 +1,62 @@
 // src/pages/Profile.tsx
-import { useState, useEffect } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useState, useEffect } from "react"
+import { useAuth } from "../context/AuthContext"
 
 const Profile = () => {
-  const { user, setUser } = useAuth();
-  const [fullName, setFullName] = useState("");
-  const [idNumber, setIdNumber] = useState("");
+  const { user, setUser } = useAuth()
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
+  const [idNumber, setIdNumber] = useState("")
 
   useEffect(() => {
     if (user) {
-      setFullName(user.fullName || "");
+      setFirstName(user.firstName || "")
+      setLastName(user.lastName || "")
     }
-  }, [user]);
+  }, [user])
 
   const handleSave = () => {
-    if (!user) return;
+    if (!user) return
     const updatedUser = {
       ...user,
-      fullName,
+      firstName,
+      lastName,
       idNumber,
       email: user.email,
-      role: user.role,  
-    };
+      role: user.role,
+    }
 
-    localStorage.setItem("user", JSON.stringify(updatedUser));
-    setUser(updatedUser);
-    alert("Profile saved!");
-  };
+    localStorage.setItem("user", JSON.stringify(updatedUser))
+    setUser(updatedUser)
+    alert("Profile saved!")
+  }
 
-  if (!user) return <div>Loading...</div>;
+  if (!user) return <div>Loading...</div>
 
   return (
     <div className="p-6 max-w-md mx-auto">
       <h2 className="text-xl font-bold mb-4">Edit Profile</h2>
 
-      <label className="block mb-2">Full Name</label>
-      <input
-        type="text"
-        className="border rounded p-2 w-full mb-4"
-        value={fullName}
-        onChange={(e) => setFullName(e.target.value)}
-      />
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label className="block mb-2">First Name</label>
+          <input
+            type="text"
+            className="border rounded p-2 w-full"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </div>
+        <div>
+          <label className="block mb-2">Last Name</label>
+          <input
+            type="text"
+            className="border rounded p-2 w-full"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+        </div>
+      </div>
 
       <label className="block mb-2">Email</label>
       <input
@@ -65,7 +81,7 @@ const Profile = () => {
         Save Profile
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default Profile;
+export default Profile
