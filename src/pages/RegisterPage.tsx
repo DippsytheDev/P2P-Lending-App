@@ -8,7 +8,7 @@ export default function Register() {
   const [lastName, setLastName] = useState("")
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'lender' | 'borrower'>('borrower');
+  const [role, setRole] = useState<'Lender' | 'Borrower'>('Borrower');
   const navigate = useNavigate();
   const {login} = useAuth();
 
@@ -33,23 +33,23 @@ export default function Register() {
         <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
 
         <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">Last Name</label>
-          <input
-            type="text"
-            className="w-full p-2 border rounded"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
           <label className="block text-sm font-semibold mb-1">First Name</label>
           <input
             type="text"
             className="w-full p-2 border rounded"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-1">Last Name</label>
+          <input
+            type="text"
+            className="w-full p-2 border rounded"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
             required
           />
         </div>
@@ -82,11 +82,11 @@ export default function Register() {
           </label>
           <select
             value={role}
-            onChange={(e) => setRole(e.target.value as "lender" | "borrower")}
+            onChange={(e) => setRole(e.target.value as "Lender" | "Borrower")}
             className="w-full p-2 border rounded"
           >
-            <option value="lender">Lender</option>
-            <option value="borrower">Borrower</option>
+            <option value="Lender">Lender</option>
+            <option value="Borrower">Borrower</option>
           </select>
         </div>
 

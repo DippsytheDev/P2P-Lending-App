@@ -16,7 +16,7 @@ export const register = async (
   lastName: string,
   email: string,
   password: string,
-  role: "lender" | "borrower"
+  role: "Lender" | "Borrower"
 ) => {
   const response = await axios.post(`${BASE_URL}/lendpool/api/v1/register`, {
     firstName,

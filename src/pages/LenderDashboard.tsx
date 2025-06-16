@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import Button from "../components/Button"
-import LenderForm from "../components/create-pool"
+import LenderForm from "../components/Create-pool"
 
 const LenderDashboard = () => {
-  const [role, setRole] = useState<"lender" | "admin">("lender")
+  const [role, setRole] = useState<"Lender" | "Admin">("Lender")
   const [openForm, setOpenForm] = useState(false)
 
   const poolOpenForm = () => {
@@ -22,7 +22,7 @@ const LenderDashboard = () => {
           </p>
         </header>
 
-        {role === "lender" ? (
+        {role === "Lender" ? (
           <section className="space-y-8">
             {/* Overview Card */}
             <div className="bg-white rounded-xl shadow-md p-6 border border-blue-100">

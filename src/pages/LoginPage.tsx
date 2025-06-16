@@ -11,7 +11,7 @@ interface DecodedToken {
   firstName: string
   lastName: string
   email: string
-  role: "lender" | "borrower" | "admin"
+  role: "Lender" | "Borrower" | "Admin"
 }
 
 export default function Login() {
@@ -91,7 +91,7 @@ export default function Login() {
               firstName: "Admin",
               lastName: "User",
               email: "admin@site.com",
-              role: "admin",
+              role: "Admin",
             }
             const mockToken = "dev-admin-token"
 

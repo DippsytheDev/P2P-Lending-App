@@ -1,7 +1,8 @@
 export interface User {
-    fullName: string;
+    firstName: string;
+    lastName: string;
     email: string;
-    role: "lender" | "borrower" | "admin";
+    role: "Lender" | "Borrower" | "Admin";
     idNumber?: string;
     isActive: boolean;
   }

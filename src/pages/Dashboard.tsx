@@ -9,9 +9,9 @@ const Dashboard = () => {
 
   if (!user) return <div>Loading user info...</div>;
 
-  if (user.role === "lender") return <LenderDashboard />;
-  if (user.role === "borrower") return <BorrowerDashboard />;
-  if (user.role === "admin") return <AdminDashboard />;
+  if (user.role === "Lender") return <LenderDashboard />;
+  if (user.role === "Borrower") return <BorrowerDashboard />;
+  if (user.role === "Admin") return <AdminDashboard />;
 
   return <div>Invalid role: {user.role}</div>;
 };

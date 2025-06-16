@@ -59,32 +59,33 @@ const onSubmit = async (data: PoolFormData) => {
     //   }
     // )
 
-      const createPool = () => {
-        return fetch(
-          "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/create-pool",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-            body: JSON.stringify(payload),
-          }
-        )
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok")
+      const createPool = async () => {
+        try {
+          const response = await fetch(
+            "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/create-pool",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + localStorage.getItem("token"),
+              },
+              body: JSON.stringify(payload),
             }
-            return response.json()
-          })
-          .then((data) => {
-            setSuccessMessage("Pool created successfully!")
-            reset()
-            return data
-          })
-          .catch((error) => {
+          )
+          if (!response.ok) {
+            throw new Error("Network response was not ok")
+          }
+          const data = await response.json()
+          setSuccessMessage("Pool created successfully!")
+          reset()
+          return data
+        } catch (error) {
+          if (error instanceof Error) {
             setApiError(error.message || "Something went wrong.")
-          })
+          } else {
+            setApiError("An unknown error occurred.")
+          }
+        }
       }
 
     const response = await createPool()
