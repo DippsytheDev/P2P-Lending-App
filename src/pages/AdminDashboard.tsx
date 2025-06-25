@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { mockUsers } from "../data/users";
+import { Link } from "react-router-dom";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState(mockUsers);
@@ -50,6 +51,24 @@ const AdminDashboard = () => {
           ))}
         </tbody>
       </table>
+
+            {/* All Pools Section */}
+            <div className="bg-white rounded-xl shadow-md p-6 border border-blue-100">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold text-blue-800">
+                  All Pools
+                </h3>
+                <Link
+                  to="/lender/pools"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition"
+                >
+                  View All Pools
+                </Link>
+              </div>
+              <p className="text-blue-900">
+                Browse all available pools and manage your contributions.
+              </p>
+            </div>
     </div>
   );
 };

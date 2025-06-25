@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import Unauthorized from './pages/Unauthorized';
 import Profile from './pages/Profile';
+import LenderPools from './components/LenderPools';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['Lender','Borrower','Admin']}><Dashboard /></ProtectedRoute>} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/lender/pools" element={<LenderPools />} />
     </Routes>
   );
 }

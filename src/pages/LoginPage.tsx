@@ -12,6 +12,7 @@ interface DecodedToken {
   lastName: string
   email: string
   role: "Lender" | "Borrower" | "Admin"
+  userId: string
 }
 
 export default function Login() {
@@ -43,6 +44,7 @@ export default function Login() {
         role: decoded[
           "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
         ],
+        userId: decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"],
       }
 
       console.log("Decoded User(mapped):", decodedUser)
@@ -52,6 +54,7 @@ export default function Login() {
           lastName: decodedUser.lastName,
           email: decodedUser.email,
           role: decodedUser.role,
+          userId: decodedUser.userId,
         },
         rawToken
       )
@@ -92,6 +95,7 @@ export default function Login() {
               lastName: "User",
               email: "admin@site.com",
               role: "Admin",
+              userId: "admin-user-id",
             }
             const mockToken = "dev-admin-token"
 

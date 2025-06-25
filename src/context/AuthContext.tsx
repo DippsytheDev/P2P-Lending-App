@@ -8,6 +8,7 @@ interface User {
   lastName: string
   email: string
   role: string
+  userId:string
 }
 
 interface AuthContextType {
@@ -16,6 +17,7 @@ interface AuthContextType {
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +25,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -46,6 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.warn("No valid token found in localStorage.");
       localStorage.removeItem("token");
     }
+    setLoading(false);
   }, []);
 
   const login = (user: User, token: string) => {
@@ -64,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout, setUser }}>
+    <AuthContext.Provider value={{ user, token, login, logout, setUser, loading }}>
       {children}
     </AuthContext.Provider>
   );
