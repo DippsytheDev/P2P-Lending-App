@@ -6,6 +6,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { jwtDecode } from "jwt-decode"
+import { set } from "react-hook-form"
 
 interface DecodedToken {
   firstName: string
@@ -18,11 +19,14 @@ interface DecodedToken {
 export default function Login() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
+
     try {
       const data = await apiLogin(email, password)
       console.log("Login data:", data)
@@ -59,6 +63,7 @@ export default function Login() {
         rawToken
       )
       navigate("/dashboard")
+      setLoading(false)
     } catch (err: any) {
       console.error("Login error:", err.response?.data || err.message)
       alert(err.response?.data?.message || "Login failed. Check credentials.")
@@ -86,7 +91,12 @@ export default function Login() {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <Button type="submit">Login</Button>
+        <Button
+          type="submit"
+          className={`w-full py-2 px-4 rounded font-bold text-white ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
+        >
+          Login
+        </Button>
         <Button
           type="button"
           onClick={() => {
@@ -105,6 +115,7 @@ export default function Login() {
             login(mockUser, mockToken)
             navigate("/dashboard")
           }}
+          className={`w-full py-2 px-4 rounded font-bold text-white ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
         >
           Dev Login as Admin
         </Button>

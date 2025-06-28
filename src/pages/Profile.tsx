@@ -1,5 +1,6 @@
 // src/pages/Profile.tsx
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router"
 import { useAuth } from "../context/AuthContext"
 
 const Profile = () => {
@@ -7,6 +8,7 @@ const Profile = () => {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [idNumber, setIdNumber] = useState("")
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (user) {
@@ -29,6 +31,7 @@ const Profile = () => {
     localStorage.setItem("user", JSON.stringify(updatedUser))
     setUser(updatedUser)
     alert("Profile saved!")
+    navigate("/dashboard")
   }
 
   if (!user) return <div>Loading...</div>

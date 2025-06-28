@@ -53,6 +53,24 @@ const LenderDashboard = () => {
               </p>
             </div>
 
+            {/* Wallet Section */}
+            <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-blue-100">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-2xl font-bold text-blue-700 mb-4">
+                  Wallet
+                </h3>
+                <Link
+                  to="/wallet"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition-transform transform hover:scale-105"
+                >
+                  Go to Wallet
+                </Link>
+              </div>
+              <p className="text-blue-900">
+                View your wallet balance, transactions, and fund your wallet.
+              </p>
+            </div>
+
             {/* Create Pool Section */}
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-blue-100">
               <div className="flex justify-between items-center mb-4">
@@ -113,7 +131,7 @@ const LenderDashboard = () => {
         )}
       </div>
     </div>
-  );
+  )
 };
 
 export default LenderDashboard;

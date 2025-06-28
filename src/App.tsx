@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Unauthorized from './pages/Unauthorized';
 import Profile from './pages/Profile';
 import LenderPools from './components/LenderPools';
+import WalletPage from './pages/WalletPage';
 
 function App() {
   return (
@@ -13,12 +14,27 @@ function App() {
       <Route path="/" element={<LoginPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['Lender','Borrower','Admin']}><Dashboard /></ProtectedRoute>} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute allowedRoles={["Lender", "Borrower", "Admin"]}>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/wallet"
+        element={
+          <ProtectedRoute allowedRoles={["Lender", "Borrower", "Admin"]}>
+            <WalletPage/>
+          </ProtectedRoute>
+        }
+      />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/lender/pools" element={<LenderPools />} />
     </Routes>
-  );
+  )
 }
 
 export default App;
