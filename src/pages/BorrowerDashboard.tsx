@@ -31,31 +31,30 @@ export default function BorrowerDashboard() {
   const [duration, setDuration] = useState("")
   const [purpose, setPurpose] = useState("")
 
-
   useEffect(() => {
     const fetchMyPools = async () => {
       try {
         const res = await axios.get(
-          "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/get-all-pools",
+          "https://lendpool-api-web.onrender.com/lendpool/api/v1/borrower/get-all-pools",
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
-        );
-        setPools(res.data.data);
+        )
+        setPools(res.data.data)
       } catch (err) {
-        console.error("Failed to fetch pools:", err);
+        console.error("Failed to fetch pools:", err)
       }
-    };
+    }
 
-    fetchMyPools();
-  }, [token]);
+    fetchMyPools()
+  }, [token])
 
   const handleRequestLoan = async () => {
     try {
       await axios.post(
-        "https://lendpool-api-web.onrender.com/api/loans/request",
+        "https://lendpool-api-web.onrender.com/lendpool/api/v1/loan/my-requests",
         {
           requestedAmount: Number(requestedAmount),
           durationInMonths: Number(duration),
@@ -81,26 +80,31 @@ export default function BorrowerDashboard() {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-semibold mb-6 text-blue-700">Available Lending Pools</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-blue-700">
+        Available Lending Pools
+      </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {pools.map((pool) => (
           <Card key={pool.id}>
             <CardHeader>
-              <CardTitle>{pool.name}</CardTitle>
-              <p className="text-sm text-muted-foreground">{pool.description}</p>
+              <CardTitle className="text-lg text-blue-700">
+                {pool.name}
+              </CardTitle>
+              <p className="text-sm text-blue-700">{pool.description}</p>
             </CardHeader>
             <CardContent className="space-y-2">
-              <p>
-                <strong>Interest Rate:</strong> {pool.interestRate}%
+              <p className="text-blue-700">
+                <strong className="text-blue-700">Interest Rate:</strong>{" "}
+                {pool.interestRate}%
               </p>
-              <p>
-                <strong>Range:</strong> ₦{pool.minimumAmount.toLocaleString()} – ₦
-                {pool.maximumAmount.toLocaleString()}
+              <p className="text-blue-700">
+                <strong>Range:</strong> ₦{pool.minimumAmount.toLocaleString()} –
+                ₦{pool.maximumAmount.toLocaleString()}
               </p>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
-                    className="mt-4"
+                    className="mt-4 text-blue-700 bg-blue-100 hover:bg-blue-200"
                     onClick={() => setSelectedPool(pool)}
                   >
                     Request Loan
@@ -108,33 +112,49 @@ export default function BorrowerDashboard() {
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
-                    <DialogTitle>Request Loan from {pool.name}</DialogTitle>
+                    <DialogTitle className="text-blue-700">
+                      Request Loan from {pool.name}
+                    </DialogTitle>
                   </DialogHeader>
                   <div className="space-y-4">
-                    <div>
-                      <Label>Requested Amount</Label>
+                    <div className="space-y-2 ">
+                      <Label className="text-blue-700">Requested Amount</Label>
                       <Input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         value={requestedAmount}
-                        onChange={(e) => setRequestedAmount(e.target.value)}
+                        onChange={(e) => {
+                          const onlyNum = e.target.value.replace(/[^0-9]/g, "")
+                          setRequestedAmount(onlyNum)
+                        }}
+                        placeholder="Enter Requested Amount"
                       />
                     </div>
-                    <div>
-                      <Label>Duration (in months)</Label>
+                    <div className="space-y-2">
+                      <Label className="text-blue-700">
+                        Duration (in months)
+                      </Label>
                       <Input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         value={duration}
-                        onChange={(e) => setDuration(e.target.value)}
+                        onChange={(e) => {
+                          const onlyNums = e.target.value.replace(/[^0-9]/g, "")
+                          setDuration(onlyNums)
+                        }}
+                        placeholder="Enter duration"
                       />
                     </div>
-                    <div>
-                      <Label>Purpose</Label>
+                    <div className="space-y-2">
+                      <Label className="text-blue-700">Purpose</Label>
                       <Input
                         value={purpose}
                         onChange={(e) => setPurpose(e.target.value)}
                       />
                     </div>
-                    <Button onClick={handleRequestLoan}>Submit</Button>
+                    <Button className="text-blue-700 bg-blue-100 hover:bg-blue-200 " onClick={handleRequestLoan}>Submit</Button>
                   </div>
                 </DialogContent>
               </Dialog>
