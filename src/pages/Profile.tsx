@@ -7,6 +7,9 @@ const Profile = () => {
   const { user, setUser } = useAuth()
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
+  const [businessName, setBusinessName] = useState("")
+  const [registrationNumber, setRegistrationNumber] = useState("")
+  const [investmentCapacity, setInvestmentCapacity] = useState("")
   const [idNumber, setIdNumber] = useState("")
   const navigate = useNavigate()
 
@@ -75,6 +78,30 @@ const Profile = () => {
         className="border rounded p-2 w-full mb-4"
         value={idNumber}
         onChange={(e) => setIdNumber(e.target.value)}
+      />
+
+      <label className="block mb-2">Business Name </label>
+      <input
+        type="text"
+        className="border rounded p-2 w-full mb-4"
+        value={businessName}
+        onChange={(e) => setBusinessName(e.target.value)}
+      />
+
+      <label className="block mb-2">Registration Number </label>
+      <input
+        type="text"
+        className="border rounded p-2 w-full mb-4"
+        value={registrationNumber}
+        onChange={(e) => setRegistrationNumber(e.target.value)}
+      />
+
+      <label className="block mb-2">Investment Capacity</label>
+      <input
+        type="text"
+        className="border rounded p-2 w-full mb-4"
+        value={investmentCapacity}
+        onChange={(e) => setInvestmentCapacity(e.target.value)}
       />
 
       <button
