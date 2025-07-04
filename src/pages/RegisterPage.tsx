@@ -1,102 +1,118 @@
-import React, { useState } from 'react';
-import { register } from '../auth';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from "react";
+import { register } from "../auth";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 
 export default function Register() {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState("")
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState<'Lender' | 'Borrower'>('Borrower');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"Lender" | "Borrower">("Borrower");
   const navigate = useNavigate();
-  const {login} = useAuth();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const data = await register(firstName, lastName, email, password, role);
+      const trimmedFirstName = firstName.trim();
+      const trimmedLastName = lastName.trim();
+      if (!trimmedFirstName) {
+        alert("First name is required.");
+        return;
+      }
+      const data = await register(
+        trimmedFirstName,
+        trimmedLastName,
+        email,
+        password,
+        role
+      );
       console.log("Registration data:", data);
-    login(data.user, data.token);
-      navigate('/dashboard');
+      login(data.user, data.token);
+      navigate("/dashboard");
     } catch (err) {
-      alert('Registration failed');
+      alert("Registration failed");
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-white to-[#FDF9F2]">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm"
+        className="bg-white p-8 rounded-[12px] shadow-lg w-full max-w-sm transition-all duration-300 ease-in-out flex flex-col gap-6"
+        style={{ fontFamily: "Inter, sans-serif" }}
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">First Name</label>
-          <input
-            type="text"
-            className="w-full p-2 border rounded"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">Last Name</label>
-          <input
-            type="text"
-            className="w-full p-2 border rounded"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">Email</label>
-          <input
-            type="email"
-            className="w-full p-2 border rounded"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">Password</label>
-          <input
-            type="password"
-            className="w-full p-2 border rounded"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-1">
+        <h2 className="text-3xl font-bold mb-2 text-center text-[#1A1A1A]">
+          Register
+        </h2>
+        <p className="text-[#4B4B4B] text-base text-center mb-4">
+          Create your account to get started.
+        </p>
+        <Input
+          type="text"
+          placeholder="First Name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+          className="h-12 text-base"
+        />
+        <Input
+          type="text"
+          placeholder="Last Name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+          className="h-12 text-base"
+        />
+        <Input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="h-12 text-base"
+        />
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="h-12 text-base"
+        />
+        <div>
+          <label className="block text-sm font-semibold mb-1 text-[#333]">
             Register As
           </label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value as "Lender" | "Borrower")}
-            className="w-full p-2 border rounded"
+            className="w-full h-12 px-3 py-2 border border-[#E0E0E0] rounded-[8px] bg-[#FAFAFA] text-base focus:outline-none focus:ring-2 focus:ring-[#FACC15] transition-all duration-300 ease-in-out"
           >
             <option value="Lender">Lender</option>
             <option value="Borrower">Borrower</option>
           </select>
         </div>
-
-        <button
+        <Button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+          variant="default"
+          className="w-full py-3 rounded-[8px] font-bold text-white text-base bg-[#1A1A1A] hover:bg-[#333] transition-all duration-300 ease-in-out"
         >
           Register
-        </button>
+        </Button>
+        <p className="text-sm mt-2 text-center text-[#4B4B4B]">
+          Already have an account?{" "}
+          <a
+            href="/login"
+            className="text-[#1A1A1A] underline hover:text-[#333] transition-all duration-300 ease-in-out"
+          >
+            Login
+          </a>
+        </p>
       </form>
     </div>
-  )
+  );
 }

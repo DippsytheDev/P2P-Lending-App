@@ -1,0 +1,767 @@
+{
+	"info": {
+		"_postman_id": "37d395cf-5000-4acf-a98a-6d612f274fba",
+		"name": "Lenders Marketplace API - Complete",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "46438115",
+		"_collection_link": "https://lendpool.postman.co/workspace/2a998cd8-3c05-4c1e-8c9c-7144a32cc7e1/collection/21439742-37d395cf-5000-4acf-a98a-6d612f274fba?action=share&source=collection_link&creator=46438115"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"123456\",\n  \"role\": \"Lender\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"123456\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/user/current",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"user",
+								"current"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"fullName\": \"New Name\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/users/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "kyc-borrower",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bvn\": \"string\",\n  \"nationalId\": \"string\",\n  \"dateOfBirth\": \"2025-06-05T21:14:56.474Z\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/kyc-borrower",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"kyc-borrower"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "kyc-lender",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"businessName\": \"string\",\r\n  \"registrationNumber\": \"string\",\r\n  \"investmentCapacity\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/kyc-lender",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"kyc-lender"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lender Pools",
+			"item": [
+				{
+					"name": "Create Pool",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Sanwo-olu\",\n  \"description\": \"We give above 5million\",\n  \"interestRate\": 20,\n  \"minimumAmount\": 200000,\n  \"maximumAmount\": 100000000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/lender/create-pool",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"lender",
+								"create-pool"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Pools",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/lender/get-all-pools",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"lender",
+								"get-all-pools"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add user",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"string\",\n  \"poolId\": \"string\"\n}\n// pool id will  be gotten when you call get all pools"
+						},
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/lender/add-user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"lender",
+								"add-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Contribute",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"poolId\": \"string\",\r\n  \"userId\": \"string\",\r\n  \"amount\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/lender/contribute",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"lender",
+								"contribute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Loans",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/lender/loans/?poolId=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"lender",
+								"loans",
+								""
+							],
+							"query": [
+								{
+									"key": "poolId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pool Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/lender/summary/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"lender",
+								"summary",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw From Pool",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"poolId\": \"string\",\r\n  \"userId\": \"string\",\r\n  \"userWalletId\": \"string\",\r\n  \"amount\": 0\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/lender/withdraw",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"lender",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Loan Requests",
+			"item": [
+				{
+					"name": "Request Loan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestedAmount\": 0,\n  \"purpose\": \"string\",\n  \"durationInMonths\": 0,\n  \"matchedPoolId\": \"string\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/loan/request-loan",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"loan",
+								"request-loan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Loan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"requestId\": \"string\",\r\n  \"comment\": \"string\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/loan/approve-loan",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"loan",
+								"approve-loan"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Loan",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/loans/1/reject",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"loans",
+								"1",
+								"reject"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Loan Requests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/loan/my-requests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"loan",
+								"my-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My loans",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/loan/my-loans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"loan",
+								"my-loans"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Loan by Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/loan/get-loan-by-id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"loan",
+								"get-loan-by-id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Loan By Pool Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/lendpool/api/v1/loan/get-loans-by-pool-id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"lendpool",
+								"api",
+								"v1",
+								"loan",
+								"get-loans-by-pool-id"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Repayments",
+			"item": [
+				{
+					"name": "Make Repayment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 2000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/repayments/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"repayments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "View Repayments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/repayments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"repayments"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Wallet",
+			"item": [
+				{
+					"name": "View Wallet",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/wallet",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Top-up Wallet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 10000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/wallet/topup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallet",
+								"topup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Withdraw from Wallet",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 5000\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/wallet/withdraw",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"wallet",
+								"withdraw"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000"
+		},
+		{
+			"key": "token",
+			"value": ""
+		}
+	]
+}

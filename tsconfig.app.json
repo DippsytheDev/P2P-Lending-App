@@ -8,9 +8,9 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "baseUrl": ".",
-"paths": {
-  "@/*": ["src/*"]
-},
+    "paths": {
+      "@/*": ["src/*"]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -22,12 +22,10 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
 
-
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
