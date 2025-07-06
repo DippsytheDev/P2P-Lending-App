@@ -13,6 +13,8 @@ const Profile = () => {
   const [idNumber, setIdNumber] = useState("")
   const navigate = useNavigate()
 
+
+  // if (user.role === "Lender") return 
   useEffect(() => {
     if (user) {
       setFirstName(user.firstName || "")

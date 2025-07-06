@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import axios from "axios"
 import { useAuth } from "@/context/AuthContext"
+import { Link } from "react-router-dom"
 
 type Pool = {
   id: string
@@ -83,6 +84,24 @@ export default function BorrowerDashboard() {
       <h2 className="text-2xl font-semibold mb-6 text-blue-700">
         Available Lending Pools
       </h2>
+        {/* Overview */}
+        <div className="bg-white mb-4 rounded-xl shadow-sm hover:shadow-md transition-shadow p-6 border border-blue-100">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-2xl font-bold text-blue-700 mb-4">
+              Your Overview
+            </h3>
+            <Link
+              to="/profile"
+              className="text-blue-600 hover:underline font-medium text-sm"
+            >
+              Go to Profile
+            </Link>
+          </div>
+          {/* <p className="text-blue-900">
+            Overview of pools, contributions, and earnings will be displayed
+            here.
+          </p> */}
+        </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {pools.map((pool) => (
           <Card key={pool.id}>
@@ -154,7 +173,12 @@ export default function BorrowerDashboard() {
                         onChange={(e) => setPurpose(e.target.value)}
                       />
                     </div>
-                    <Button className="text-blue-700 bg-blue-100 hover:bg-blue-200 " onClick={handleRequestLoan}>Submit</Button>
+                    <Button
+                      className="text-blue-700 bg-blue-100 hover:bg-blue-200 "
+                      onClick={handleRequestLoan}
+                    >
+                      Submit
+                    </Button>
                   </div>
                 </DialogContent>
               </Dialog>
