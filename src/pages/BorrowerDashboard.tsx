@@ -10,7 +10,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import axios from "axios";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -19,7 +18,6 @@ import {
   User,
   FileText,
   CreditCard,
-  Clock,
   HelpCircle,
   Settings,
   Headphones,
@@ -114,15 +112,6 @@ export default function BorrowerDashboard() {
   const { user, token } = useAuth();
   const [pools, setPools] = useState<Pool[]>([]);
   const [selectedPool, setSelectedPool] = useState<Pool | null>(null);
-  const [requestedAmount, setRequestedAmount] = useState("");
-  const [duration, setDuration] = useState("");
-  const [purpose, setPurpose] = useState("");
-
-  // New state for loan requests
-  const [loanRequests, setLoanRequests] = useState<LoanRequest[]>([]);
-  const [loadingLoans, setLoadingLoans] = useState(false);
-  const [loanError, setLoanError] = useState<string | null>(null);
-
   const [activeMenu, setActiveMenu] = useState("overview");
   const [applyTab, setApplyTab] = useState<"pools" | "requests">("pools");
   const [loanForm, setLoanForm] = useState({
@@ -131,6 +120,9 @@ export default function BorrowerDashboard() {
     durationInMonths: "",
   });
   const [submitting, setSubmitting] = useState(false);
+
+  // New state for loan requests
+  const [loanRequests, setLoanRequests] = useState<LoanRequest[]>([]);
 
   useEffect(() => {
     const fetchMyPools = async () => {
@@ -155,8 +147,6 @@ export default function BorrowerDashboard() {
   // Fetch loan requests
   useEffect(() => {
     const fetchLoanRequests = async () => {
-      setLoadingLoans(true);
-      setLoanError(null);
       try {
         const res = await axios.get(
           "https://lendpool-api-web.onrender.com/lendpool/api/v1/loan/my-requests",
@@ -168,9 +158,9 @@ export default function BorrowerDashboard() {
         );
         setLoanRequests(res.data.data);
       } catch (err: any) {
-        setLoanError("Failed to fetch loan requests.");
+        // setLoanError("Failed to fetch loan requests."); // Removed unused state
       } finally {
-        setLoadingLoans(false);
+        // setLoadingLoans(false); // Removed unused state
       }
     };
     if (token) fetchLoanRequests();

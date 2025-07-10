@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { mockUsers } from "../data/users";
-import { Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -53,7 +52,6 @@ const getStatusColor = (status: string) => {
 };
 
 const AdminDashboard = () => {
-  const [users, setUsers] = useState(mockUsers);
   const [loanMatches, setLoanMatches] = useState<{
     [key: string]: string | null;
   }>({});

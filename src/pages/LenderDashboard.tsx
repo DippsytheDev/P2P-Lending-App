@@ -1,7 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import Button from "../components/Button";
 import LenderForm from "./CreatePool";
 import MyPools from "./MyPools";
 import JoinPools from "./JoinPools";

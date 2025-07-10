@@ -2,6 +2,7 @@ import type { User } from "../types/user";
 
 export const mockUsers: User[] = [
   {
+    id: "1",
     firstName: "Alice",
     lastName: "Johnson",
     email: "alice@example.com",
@@ -10,6 +11,7 @@ export const mockUsers: User[] = [
     isActive: true,
   },
   {
+    id: "2",
     firstName: "Bob",
     lastName: "Smith",
     email: "bob@example.com",
@@ -18,6 +20,7 @@ export const mockUsers: User[] = [
     isActive: false,
   },
   {
+    id: "3",
     firstName: "Admin",
     lastName: "Guy",
     email: "admin@example.com",
@@ -25,4 +28,4 @@ export const mockUsers: User[] = [
     idNumber: "NIN000000",
     isActive: true,
   },
-]
+];
