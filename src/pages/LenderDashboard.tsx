@@ -3,8 +3,6 @@ import { useAuth } from "../context/AuthContext";
 import LenderForm from "./CreatePool";
 import MyPools from "./MyPools";
 import JoinPools from "./JoinPools";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   BarChart2,
   User,
