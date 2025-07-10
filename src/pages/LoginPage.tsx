@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { jwtDecode } from "jwt-decode";
-import { set } from "react-hook-form";
 
 interface DecodedToken {
   firstName: string;

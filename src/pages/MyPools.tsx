@@ -12,7 +12,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
 
@@ -29,7 +28,7 @@ export default function MyPools() {
   const [pools, setPools] = useState<Pool[]>([]);
   const [userIdToAdd, setUserIdToAdd] = useState("");
   const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
-  const { token,user } = useAuth();
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchMyPools = async () => {
@@ -43,7 +42,8 @@ export default function MyPools() {
           }
         );
         const sorted = res.data.data.sort(
-          (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a: any, b: any) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         setPools(sorted);
         console.log(sorted);
@@ -57,9 +57,9 @@ export default function MyPools() {
 
   const handleAddUser = async () => {
     if (!selectedPoolId || !userIdToAdd) return;
-  
+
     try {
-      const res = await axios.post(
+      await axios.post(
         "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/add-user",
         {
           userId: userIdToAdd,
@@ -71,7 +71,7 @@ export default function MyPools() {
           },
         }
       );
-  
+
       alert(`✅ User added successfully to pool`);
       setUserIdToAdd("");
     } catch (err: any) {
@@ -82,18 +82,31 @@ export default function MyPools() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <h2 className="text-3xl font-extrabold text-blue-800 mb-6 tracking-tight">My Pools</h2>
+      <h2 className="text-3xl font-extrabold text-blue-800 mb-6 tracking-tight">
+        My Pools
+      </h2>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {pools.map((pool) => (
-          <Card key={pool.id} className="hover:shadow-lg transition-shadow border border-blue-100">
+          <Card
+            key={pool.id}
+            className="hover:shadow-lg transition-shadow border border-blue-100"
+          >
             <CardHeader>
               <CardTitle className="text-blue-800">{pool.name}</CardTitle>
-              <p className="text-sm text-gray-600 break-words line-clamp-2">{pool.description}</p>
+              <p className="text-sm text-gray-600 break-words line-clamp-2">
+                {pool.description}
+              </p>
             </CardHeader>
             <CardContent className="space-y-2 text-blue-900 text-sm">
-              <p><strong>Interest:</strong> {pool.interestRate}%</p>
-              <p><strong>Min:</strong> ₦{pool.minimumAmount.toLocaleString()}</p>
-              <p><strong>Max:</strong> ₦{pool.maximumAmount.toLocaleString()}</p>
+              <p>
+                <strong>Interest:</strong> {pool.interestRate}%
+              </p>
+              <p>
+                <strong>Min:</strong> ₦{pool.minimumAmount.toLocaleString()}
+              </p>
+              <p>
+                <strong>Max:</strong> ₦{pool.maximumAmount.toLocaleString()}
+              </p>
               <div className="flex gap-2 mt-4">
                 <Dialog>
                   <DialogTrigger asChild>
@@ -119,11 +132,21 @@ export default function MyPools() {
                         value={userIdToAdd}
                         onChange={(e) => setUserIdToAdd(e.target.value)}
                       />
-                      <Button className="bg-blue-600 hover:bg-blue-700 text-white transition" onClick={handleAddUser}>Confirm</Button>
+                      <Button
+                        className="bg-blue-600 hover:bg-blue-700 text-white transition"
+                        onClick={handleAddUser}
+                      >
+                        Confirm
+                      </Button>
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button variant="outline" className="transition hover:border-blue-400">View Contributions</Button>
+                <Button
+                  variant="outline"
+                  className="transition hover:border-blue-400"
+                >
+                  View Contributions
+                </Button>
               </div>
             </CardContent>
           </Card>
