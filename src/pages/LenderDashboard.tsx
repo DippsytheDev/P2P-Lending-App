@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Button from "../components/Button";
@@ -17,70 +17,189 @@ import {
   Settings,
   Headphones,
   Home,
+  Loader2,
 } from "lucide-react";
 import Profile from "./Profile";
 import WalletPage from "./WalletPage";
+import axios from "axios";
 
-// Mock data for lender features
-const mockFundedLoans = [
-  {
-    id: "l1",
-    borrower: "Jane Doe",
-    amount: 500000,
-    pool: "Pool A",
-    status: "active",
-    date: "2024-06-20",
-  },
-  {
-    id: "l2",
-    borrower: "John Smith",
-    amount: 200000,
-    pool: "Pool B",
-    status: "repaid",
-    date: "2024-05-15",
-  },
-];
-const mockRepayments = [
-  { id: "r1", loan: "l1", amount: 50000, date: "2024-07-01" },
-  { id: "r2", loan: "l2", amount: 200000, date: "2024-06-01" },
-];
-const mockEarnings = 250000;
-const mockPoolPerformance = [
-  { pool: "Pool A", earnings: 150000 },
-  { pool: "Pool B", earnings: 100000 },
-];
+// Types for API data
+interface FundedLoan {
+  id: string;
+  borrower: string;
+  amount: number;
+  pool: string;
+  status: string;
+  date: string;
+}
 
-const getStatusColor = (status: string) => {
-  if (status === "active") return "bg-yellow-100 text-yellow-800";
-  if (status === "repaid" || status === "completed")
-    return "bg-green-100 text-green-800";
-  if (status === "defaulted") return "bg-red-100 text-red-800";
-  return "bg-gray-100 text-gray-800";
-};
+interface Repayment {
+  id: string;
+  loan: string;
+  amount: number;
+  date: string;
+}
 
-const menuItems = [
-  { key: "overview", label: "Overview", icon: Home },
-  { key: "profile", label: "Profile", icon: User },
-  { key: "wallet", label: "Wallet", icon: Wallet },
-  { key: "pools", label: "Pools", icon: Layers },
-];
-const bottomMenu = [
-  { key: "support", label: "Support", icon: HelpCircle },
-  { key: "settings", label: "Settings", icon: Settings },
-  { key: "customer", label: "Customer Service", icon: Headphones },
-];
+interface PoolPerformance {
+  pool: string;
+  earnings: number;
+}
+
+interface LenderSummary {
+  totalEarnings: number;
+  totalFundedLoans: number;
+  activeLoans: number;
+  completedLoans: number;
+}
 
 const LenderDashboard = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [selectedMenu, setSelectedMenu] = useState("overview");
   const [openForm, setOpenForm] = useState(false);
   const poolOpenForm = () => setOpenForm(!openForm);
   const [tab, setTab] = useState("my-pools");
 
+  // State for real data
+  const [fundedLoans, setFundedLoans] = useState<FundedLoan[]>([]);
+  const [repayments, setRepayments] = useState<Repayment[]>([]);
+  const [poolPerformance, setPoolPerformance] = useState<PoolPerformance[]>([]);
+  const [lenderSummary, setLenderSummary] = useState<LenderSummary | null>(null);
+  
+  // Loading and error states
+  const [loadingLoans, setLoadingLoans] = useState(false);
+  const [loadingRepayments, setLoadingRepayments] = useState(false);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   console.log("User in LenderDashboard:", user);
 
   const displayName =
     user?.firstName && user.firstName.trim() ? user.firstName.trim() : "User";
+
+  // Fetch lender summary data
+  useEffect(() => {
+    const fetchLenderSummary = async () => {
+      if (!token) return;
+      
+      setLoadingSummary(true);
+      setError(null);
+      try {
+        const response = await axios.get(
+          "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/summary/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setLenderSummary(response.data.data);
+      } catch (err: any) {
+        console.error("Failed to fetch lender summary:", err);
+        setError("Failed to load dashboard summary");
+      } finally {
+        setLoadingSummary(false);
+      }
+    };
+
+    fetchLenderSummary();
+  }, [token]);
+
+  // Fetch funded loans
+  useEffect(() => {
+    const fetchFundedLoans = async () => {
+      if (!token) return;
+      
+      setLoadingLoans(true);
+      setError(null);
+      try {
+        const response = await axios.get(
+          "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/loans/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setFundedLoans(response.data.data || []);
+      } catch (err: any) {
+        console.error("Failed to fetch funded loans:", err);
+        setError("Failed to load funded loans");
+      } finally {
+        setLoadingLoans(false);
+      }
+    };
+
+    fetchFundedLoans();
+  }, [token]);
+
+  // Fetch repayments
+  useEffect(() => {
+    const fetchRepayments = async () => {
+      if (!token) return;
+      
+      setLoadingRepayments(true);
+      setError(null);
+      try {
+        const response = await axios.get(
+          "https://lendpool-api-web.onrender.com/api/repayments",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setRepayments(response.data.data || []);
+      } catch (err: any) {
+        console.error("Failed to fetch repayments:", err);
+        setError("Failed to load repayment data");
+      } finally {
+        setLoadingRepayments(false);
+      }
+    };
+
+    fetchRepayments();
+  }, [token]);
+
+  // Calculate pool performance from funded loans
+  useEffect(() => {
+    if (fundedLoans.length > 0) {
+      const poolMap = new Map<string, number>();
+      
+      fundedLoans.forEach(loan => {
+        const currentEarnings = poolMap.get(loan.pool) || 0;
+        // Calculate earnings based on loan status and amount
+        const earnings = loan.status === 'repaid' ? loan.amount * 0.1 : 0; // 10% interest as example
+        poolMap.set(loan.pool, currentEarnings + earnings);
+      });
+      
+      const performance = Array.from(poolMap.entries()).map(([pool, earnings]) => ({
+        pool,
+        earnings
+      }));
+      
+      setPoolPerformance(performance);
+    }
+  }, [fundedLoans]);
+
+  const getStatusColor = (status: string) => {
+    if (status === "active") return "bg-yellow-100 text-yellow-800";
+    if (status === "repaid" || status === "completed")
+      return "bg-green-100 text-green-800";
+    if (status === "defaulted") return "bg-red-100 text-red-800";
+    return "bg-gray-100 text-gray-800";
+  };
+
+  const menuItems = [
+    { key: "overview", label: "Overview", icon: Home },
+    { key: "profile", label: "Profile", icon: User },
+    { key: "wallet", label: "Wallet", icon: Wallet },
+    { key: "pools", label: "Pools", icon: Layers },
+  ];
+  const bottomMenu = [
+    { key: "support", label: "Support", icon: HelpCircle },
+    { key: "settings", label: "Settings", icon: Settings },
+    { key: "customer", label: "Customer Service", icon: Headphones },
+  ];
 
   return (
     <div className="flex min-h-screen h-screen bg-[#FAFAFA] font-sans">
@@ -143,9 +262,15 @@ const LenderDashboard = () => {
               <div className="bg-white rounded-xl shadow-md p-8 flex flex-col gap-8">
                 {/* Funded Loans */}
                 <div>
-                  <div className="text-xl font-bold mb-4 text-[#222]">
+                  <div className="text-xl font-bold mb-4 text-[#222] flex items-center gap-2">
                     Funded Loans
+                    {loadingLoans && <Loader2 className="w-5 h-5 animate-spin" />}
                   </div>
+                  {error && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                      {error}
+                    </div>
+                  )}
                   <table className="min-w-full text-sm mb-4">
                     <thead>
                       <tr className="bg-blue-50">
@@ -159,37 +284,46 @@ const LenderDashboard = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {mockFundedLoans.map((loan) => (
-                        <tr key={loan.id} className="border-b last:border-0">
-                          <td className="p-2">{loan.borrower}</td>
-                          <td className="p-2">
-                            ₦{loan.amount.toLocaleString()}
-                          </td>
-                          <td className="p-2">{loan.pool}</td>
-                          <td className="p-2">
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(loan.status)}`}
-                            >
-                              {loan.status}
-                            </span>
-                          </td>
-                          <td className="p-2">
-                            {new Date(loan.date).toLocaleDateString()}
+                      {fundedLoans.length === 0 && !loadingLoans ? (
+                        <tr>
+                          <td colSpan={5} className="p-4 text-center text-gray-500">
+                            No funded loans found
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        fundedLoans.map((loan) => (
+                          <tr key={loan.id} className="border-b last:border-0">
+                            <td className="p-2">{loan.borrower}</td>
+                            <td className="p-2">
+                              ₦{loan.amount.toLocaleString()}
+                            </td>
+                            <td className="p-2">{loan.pool}</td>
+                            <td className="p-2">
+                              <span
+                                className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(loan.status)}`}
+                              >
+                                {loan.status}
+                              </span>
+                            </td>
+                            <td className="p-2">
+                              {new Date(loan.date).toLocaleDateString()}
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
                 {/* Repayments & Earnings */}
                 <div>
-                  <div className="text-xl font-bold mb-4 text-[#222]">
+                  <div className="text-xl font-bold mb-4 text-[#222] flex items-center gap-2">
                     Repayments & Earnings
+                    {loadingRepayments && <Loader2 className="w-5 h-5 animate-spin" />}
                   </div>
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-4">
                     <div className="bg-[#FFFFFF] rounded-lg shadow p-4 flex items-center gap-4">
                       <span className="text-2xl font-bold text-[#7ED321]">
-                        ₦{mockEarnings.toLocaleString()}
+                        ₦{lenderSummary?.totalEarnings?.toLocaleString() || "0"}
                       </span>
                       <span className="text-[#4F4F4F]">Total Earnings</span>
                     </div>
@@ -209,17 +343,25 @@ const LenderDashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {mockRepayments.map((r) => (
-                            <tr key={r.id} className="border-b last:border-0">
-                              <td className="p-2">{r.loan}</td>
-                              <td className="p-2">
-                                ₦{r.amount.toLocaleString()}
-                              </td>
-                              <td className="p-2">
-                                {new Date(r.date).toLocaleDateString()}
+                          {repayments.length === 0 ? (
+                            <tr>
+                              <td colSpan={3} className="p-4 text-center text-gray-500">
+                                No repayment data available
                               </td>
                             </tr>
-                          ))}
+                          ) : (
+                            repayments.map((r) => (
+                              <tr key={r.id} className="border-b last:border-0">
+                                <td className="p-2">{r.loan}</td>
+                                <td className="p-2">
+                                  ₦{r.amount.toLocaleString()}
+                                </td>
+                                <td className="p-2">
+                                  {new Date(r.date).toLocaleDateString()}
+                                </td>
+                              </tr>
+                            ))
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -255,14 +397,22 @@ const LenderDashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {mockPoolPerformance.map((p) => (
-                            <tr key={p.pool} className="border-b last:border-0">
-                              <td className="p-2">{p.pool}</td>
-                              <td className="p-2">
-                                ₦{p.earnings.toLocaleString()}
+                          {poolPerformance.length === 0 ? (
+                            <tr>
+                              <td colSpan={2} className="p-4 text-center text-gray-500">
+                                No pool performance data available
                               </td>
                             </tr>
-                          ))}
+                          ) : (
+                            poolPerformance.map((p) => (
+                              <tr key={p.pool} className="border-b last:border-0">
+                                <td className="p-2">{p.pool}</td>
+                                <td className="p-2">
+                                  ₦{p.earnings.toLocaleString()}
+                                </td>
+                              </tr>
+                            ))
+                          )}
                         </tbody>
                       </table>
                     </div>

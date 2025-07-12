@@ -6,13 +6,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+} from "../components/ui/dialog";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Label } from "../components/ui/label";
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import {
   BarChart2,
   Bell,
@@ -23,6 +23,7 @@ import {
   HelpCircle,
   Settings,
   Headphones,
+  Loader2,
 } from "lucide-react";
 
 type Pool = {
@@ -35,13 +36,40 @@ type Pool = {
 };
 
 type LoanRequest = {
-  id: string;
-  requestedAmount: number;
-  durationInMonths: number;
-  purpose: string;
-  status: string;
-  createdAt: string;
+  Id: string;
+  Amount: number;
+  TenureInDays: number;
+  Purpose: string;
+  RequestStatus: string;
+  DateCreated: string;
+  MatchedPoolId: string;
 };
+
+// Types for real API data
+interface BorrowerMetrics {
+  totalBorrowed: number;
+  currentLoan: number;
+  outstandingBalance: number;
+  nextPayment: string;
+}
+
+interface RepaymentHistory {
+  date: string;
+  amount: number;
+  status: string;
+}
+
+interface Notification {
+  user: string;
+  text: string;
+  time: string;
+  avatar: string;
+}
+
+interface AccountManager {
+  name: string;
+  avatar: string;
+}
 
 const sidebarMenu = [
   { key: "overview", label: "Overview", icon: FileText },
@@ -53,55 +81,6 @@ const sidebarFooter = [
   { key: "support", label: "Support", icon: HelpCircle },
   { key: "settings", label: "Settings", icon: Settings },
   { key: "customer", label: "Customer Service", icon: Headphones },
-];
-const metricCards = [
-  { title: "Total Borrowed", value: 72000.38, sub: "" },
-  { title: "Current Loan", value: 10000.0, sub: "" },
-  { title: "Outstanding Balance", value: 9156.28, sub: "" },
-  { title: "Next Payment", value: "31/06/2025", sub: "" },
-];
-const loanByMonth = [20, 22, 25, 28, 10, 12];
-const repayByMonth = [18, 20, 23, 25, 8, 10];
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Other"];
-const repaymentHistory = [
-  { date: "31/01/2025", amount: 10000, status: "Completed" },
-  { date: "31/01/2025", amount: 10000, status: "Completed" },
-  { date: "31/01/2025", amount: 10000, status: "Completed" },
-  { date: "31/01/2025", amount: 10000, status: "Completed" },
-  { date: "31/01/2025", amount: 10000, status: "Pending" },
-  { date: "31/01/2025", amount: 10000, status: "Pending" },
-];
-const notifications = [
-  {
-    user: "You",
-    text: "paid for Month January",
-    time: "20 weeks ago",
-    avatar: "",
-  },
-  {
-    user: "You",
-    text: "paid for Month January",
-    time: "16 weeks ago",
-    avatar: "",
-  },
-  {
-    user: "You",
-    text: "paid for Month January",
-    time: "16 weeks ago",
-    avatar: "",
-  },
-  {
-    user: "You",
-    text: "paid for Month January",
-    time: "16 weeks ago",
-    avatar: "",
-  },
-];
-const accountManagers = [
-  { name: "Ahmed Kola", avatar: "" },
-  { name: "Drew Cano", avatar: "" },
-  { name: "Chima Julia", avatar: "" },
-  { name: "Andi Lane", avatar: "" },
 ];
 
 const statusBadge = (status: string) => {
@@ -123,6 +102,59 @@ export default function BorrowerDashboard() {
   const [loadingLoans, setLoadingLoans] = useState(false);
   const [loanError, setLoanError] = useState<string | null>(null);
 
+  // Mock data for metrics and history
+  const metricCards = [
+    { title: "Total Borrowed", value: 72000.38, sub: "" },
+    { title: "Current Loan", value: 10000.0, sub: "" },
+    { title: "Outstanding Balance", value: 9156.28, sub: "" },
+    { title: "Next Payment", value: "31/06/2025", sub: "" },
+  ];
+  const loanByMonth = [20, 22, 25, 28, 10, 12];
+  const repayByMonth = [18, 20, 23, 25, 8, 10];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Other"];
+  const repaymentHistory = [
+    { date: "31/01/2025", amount: 10000, status: "Completed" },
+    { date: "31/01/2025", amount: 10000, status: "Completed" },
+    { date: "31/01/2025", amount: 10000, status: "Completed" },
+    { date: "31/01/2025", amount: 10000, status: "Completed" },
+    { date: "31/01/2025", amount: 10000, status: "Pending" },
+    { date: "31/01/2025", amount: 10000, status: "Pending" },
+  ];
+  const notifications = [
+    {
+      user: "You",
+      text: "paid for Month January",
+      time: "20 weeks ago",
+      avatar: "",
+    },
+    {
+      user: "You",
+      text: "paid for Month January",
+      time: "16 weeks ago",
+      avatar: "",
+    },
+    {
+      user: "You",
+      text: "paid for Month January",
+      time: "16 weeks ago",
+      avatar: "",
+    },
+    {
+      user: "You",
+      text: "paid for Month January",
+      time: "16 weeks ago",
+      avatar: "",
+    },
+  ];
+  const accountManagers = [
+    { name: "Ahmed Kola", avatar: "" },
+    { name: "Drew Cano", avatar: "" },
+    { name: "Chima Julia", avatar: "" },
+    { name: "Andi Lane", avatar: "" },
+  ];
+
+  const [error, setError] = useState<string | null>(null);
+
   const [activeMenu, setActiveMenu] = useState("overview");
   const [applyTab, setApplyTab] = useState<"pools" | "requests">("pools");
   const [loanForm, setLoanForm] = useState({
@@ -140,6 +172,7 @@ export default function BorrowerDashboard() {
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
             },
           }
         );
@@ -152,9 +185,11 @@ export default function BorrowerDashboard() {
     fetchMyPools();
   }, [token]);
 
-  // Fetch loan requests
+  // Fetch loan requests when tab is 'requests'
   useEffect(() => {
     const fetchLoanRequests = async () => {
+      if (!token) return;
+      
       setLoadingLoans(true);
       setLoanError(null);
       try {
@@ -166,28 +201,19 @@ export default function BorrowerDashboard() {
             },
           }
         );
-        setLoanRequests(res.data.data);
+        console.log("Loan requests response:", res.data);
+        setLoanRequests(res.data.data || []);
       } catch (err: any) {
+        console.error("Failed to fetch loan requests:", err);
         setLoanError("Failed to fetch loan requests.");
+        setLoanRequests([]);
       } finally {
         setLoadingLoans(false);
       }
     };
-    if (token) fetchLoanRequests();
-  }, [token]);
 
-  // Fetch loan requests when tab is 'requests'
-  useEffect(() => {
-    if (activeMenu === "apply" && applyTab === "requests" && token) {
-      axios
-        .get(
-          "https://lendpool-api-web.onrender.com/lendpool/api/v1/loan/my-requests",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        )
-        .then((res) => setLoanRequests(res.data.data || []))
-        .catch(() => setLoanRequests([]));
+    if (activeMenu === "apply" && applyTab === "requests") {
+      fetchLoanRequests();
     }
   }, [activeMenu, applyTab, token]);
 
@@ -200,7 +226,7 @@ export default function BorrowerDashboard() {
     setSubmitting(true);
     try {
       await axios.post(
-        "https://lendpool-api-web.onrender.com/api/loan/request-loan",
+        "https://lendpool-api-web.onrender.com/lendpool/api/v1/loan/request-loan",
         {
           requestedAmount: Number(loanForm.requestedAmount),
           purpose: loanForm.purpose,
@@ -374,12 +400,9 @@ export default function BorrowerDashboard() {
             {/* Repayment History Table */}
             <div className="bg-white rounded-[8px] shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
-                <div className="text-[15px] font-semibold text-[#1A1A1A]">
+                <div className="text-[15px] font-semibold text-[#1A1A1A] flex items-center gap-2">
                   Repayment History
                 </div>
-                <button className="text-[13px] text-[#4A90E2] font-medium hover:underline">
-                  See all
-                </button>
               </div>
               <table className="w-full text-[14px]">
                 <thead>
@@ -508,47 +531,68 @@ export default function BorrowerDashboard() {
               )}
               {applyTab === "requests" && (
                 <div className="mt-6">
-                  <h3 className="text-lg font-bold mb-4 text-[#4A90E2]">
+                  <h3 className="text-lg font-bold mb-4 text-[#4A90E2] flex items-center gap-2">
                     My Loan Requests
+                    {loadingLoans && <Loader2 className="w-5 h-5 animate-spin" />}
                   </h3>
-                  <table className="w-full text-[14px]">
-                    <thead>
-                      <tr className="text-[#888] border-b border-[#E0E0E0]">
-                        <th className="py-2 text-left font-medium">Amount</th>
-                        <th className="py-2 text-left font-medium">Purpose</th>
-                        <th className="py-2 text-left font-medium">Duration</th>
-                        <th className="py-2 text-left font-medium">Status</th>
-                        <th className="py-2 text-left font-medium">
-                          Requested
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {loanRequests.map((req) => (
-                        <tr
-                          key={req.id}
-                          className="border-b border-[#F3F3F3] hover:bg-[#FAFAFA] transition"
-                        >
-                          <td className="py-3">
-                            ₦{req.requestedAmount.toLocaleString()}
-                          </td>
-                          <td className="py-3">{req.purpose}</td>
-                          <td className="py-3">{req.durationInMonths} mo</td>
-                          <td className="py-3">
-                            <span
-                              className={`inline-block px-3 py-1 text-[13px] font-medium rounded-[20px] ${req.status === "pending" ? "bg-[#FFF4D9] text-[#F5A623]" : req.status === "approved" ? "bg-[#E9F9E1] text-[#4CAF50]" : "bg-gray-200 text-gray-600"}`}
-                            >
-                              {req.status.charAt(0).toUpperCase() +
-                                req.status.slice(1)}
-                            </span>
-                          </td>
-                          <td className="py-3">
-                            {new Date(req.createdAt).toLocaleDateString()}
-                          </td>
+                  
+                  {loanError && (
+                    <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                      {loanError}
+                    </div>
+                  )}
+                  
+                  {loadingLoans ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#4A90E2]" />
+                      <span className="ml-2 text-[#888]">Loading loan requests...</span>
+                    </div>
+                  ) : (
+                    <table className="w-full text-[14px]">
+                      <thead>
+                        <tr className="text-[#888] border-b border-[#E0E0E0]">
+                          <th className="py-2 text-left font-medium">Amount</th>
+                          <th className="py-2 text-left font-medium">Purpose</th>
+                          <th className="py-2 text-left font-medium">Tenure (days)</th>
+                          <th className="py-2 text-left font-medium">Status</th>
+                          <th className="py-2 text-left font-medium">Requested</th>
+                          <th className="py-2 text-left font-medium">Pool</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {loanRequests.length === 0 ? (
+                          <tr>
+                            <td colSpan={6} className="py-8 text-center text-gray-500">
+                              No loan requests found
+                            </td>
+                          </tr>
+                        ) : (
+                          loanRequests.map((req) => (
+                            <tr key={req.Id} className="border-b border-[#F3F3F3] hover:bg-[#FAFAFA] transition">
+                              <td className="py-3">₦{(req.Amount || 0).toLocaleString()}</td>
+                              <td className="py-3">{req.Purpose || 'N/A'}</td>
+                              <td className="py-3">{req.TenureInDays || 'N/A'}</td>
+                              <td className="py-3">
+                                <span
+                                  className={`inline-block px-3 py-1 text-[13px] font-medium rounded-[20px] ${
+                                    req.RequestStatus === "pending"
+                                      ? "bg-[#FFF4D9] text-[#F5A623]"
+                                      : req.RequestStatus === "approved"
+                                      ? "bg-[#E9F9E1] text-[#4CAF50]"
+                                      : "bg-gray-200 text-gray-600"
+                                  }`}
+                                >
+                                  {(req.RequestStatus || 'Unknown').charAt(0).toUpperCase() + (req.RequestStatus || 'Unknown').slice(1)}
+                                </span>
+                              </td>
+                              <td className="py-3">{req.DateCreated ? new Date(req.DateCreated).toLocaleDateString() : 'N/A'}</td>
+                              <td className="py-3">{req.MatchedPoolId || 'N/A'}</td>
+                            </tr>
+                          ))
+                        )}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               )}
             </div>
