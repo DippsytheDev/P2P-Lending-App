@@ -1,6 +1,6 @@
 // pages/JoinPools.tsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import {
   Dialog,
   DialogTrigger,
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 type Pool = {
   id: string;
@@ -33,14 +33,7 @@ export default function JoinPools() {
 
   const fetchPools = async () => {
     try {
-      const res = await axios.get(
-        "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/get-all-pools",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await api.get("/lender/get-all-pools");
       setPools(res.data.data); // adjust if shape is different
     } catch (error) {
       console.error("Failed to fetch pools:", error);
@@ -57,15 +50,7 @@ export default function JoinPools() {
         amount: parseFloat(amount),
       };
 
-      await axios.post(
-        "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/contribute",
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post("/lender/contribute", payload);
 
       alert("Contribution successful!");
       setAmount("");

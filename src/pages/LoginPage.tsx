@@ -28,8 +28,15 @@ export default function Login() {
     setLoading(true);
 
     try {
+      console.log("Attempting login with:", { email, password });
       const data = await apiLogin(email, password);
-      console.log("Login data:", data);
+      console.log("Login API response:", data);
+      
+      // Check if the response structure is as expected
+      if (!data.token || !data.token.data || !data.token.data.token) {
+        throw new Error("Invalid response structure from login API");
+      }
+      
       const rawToken = data.token.data.token;
       const decoded = jwtDecode<any>(rawToken);
       console.log("Raw decoded token:", decoded); // Debugging
@@ -55,6 +62,16 @@ export default function Login() {
       };
 
       console.log("Decoded User(mapped):", decodedUser);
+      
+      // Extract refresh token from response (adjust based on your API response structure)
+      const refreshToken = data.token.data.refreshToken || data.refreshToken || "default-refresh-token";
+      
+      console.log("About to call login function with:", {
+        user: decodedUser,
+        token: rawToken,
+        refreshToken
+      });
+      
       login(
         {
           firstName: decodedUser.firstName,
@@ -63,13 +80,19 @@ export default function Login() {
           role: decodedUser.role,
           userId: decodedUser.userId,
         },
-        rawToken
+        rawToken,
+        refreshToken
       );
-      navigate("/dashboard");
+      
+      console.log("Login function called successfully, navigating to dashboard...");
       setLoading(false);
+      navigate("/dashboard");
     } catch (err: any) {
-      console.error("Login error:", err.response?.data || err.message);
-      alert(err.response?.data?.message || "Login failed. Check credentials.");
+      console.error("Login error details:", err);
+      console.error("Login error response:", err.response?.data);
+      console.error("Login error status:", err.response?.status);
+      alert(err.response?.data?.message || err.message || "Login failed. Check credentials.");
+      setLoading(false);
     }
   };
 
@@ -126,13 +149,25 @@ export default function Login() {
             localStorage.setItem("user", JSON.stringify(mockUser));
             localStorage.setItem("token", mockToken);
 
-            login(mockUser, mockToken);
+            login(mockUser, mockToken, "mock-refresh-token");
             navigate("/dashboard");
           }}
           className="w-full py-3 rounded-[8px] font-bold text-[#333] bg-[#F4F4F4] border border-[#DDDDDD] hover:bg-[#EDEDED] transition-all duration-300 ease-in-out"
           disabled={loading}
         >
           Dev Login as Admin
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => {
+            console.log("Testing navigation directly...");
+            navigate("/dashboard");
+          }}
+          className="w-full py-3 rounded-[8px] font-bold text-[#333] bg-[#F4F4F4] border border-[#DDDDDD] hover:bg-[#EDEDED] transition-all duration-300 ease-in-out"
+          disabled={loading}
+        >
+          Test Navigation
         </Button>
         <p className="text-sm mt-2 text-center text-[#4B4B4B]">
           Don't have an account?{" "}

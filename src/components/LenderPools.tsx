@@ -1,6 +1,6 @@
 // src/pages/LenderPools.tsx
 import { useEffect, useState } from 'react';
-import axios from 'axios';
+import api from "../lib/axios";
 import { useAuth } from '../context/AuthContext';
 
 interface Pool {
@@ -21,14 +21,7 @@ export default function LenderPools() {
   useEffect(() => {
     const fetchPools = async () => {
       try {
-        const response = await axios.get(
-          'https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/get-all-pools',
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await api.get('/lender/get-all-pools');
         setPools(response.data.data); // Adjust based on actual response
       } catch (err: any) {
         setError('Failed to fetch pools');
@@ -47,7 +40,7 @@ export default function LenderPools() {
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Your Pools</h2>
       {pools.length === 0 ? (
-        <p>You haven’t created any pools yet.</p>
+        <p>You haven't created any pools yet.</p>
       ) : (
         <div className="space-y-4">
           {pools.map((pool) => (

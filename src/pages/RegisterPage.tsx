@@ -31,7 +31,9 @@ export default function Register() {
         role
       );
       console.log("Registration data:", data);
-      login(data.user, data.token);
+      // Extract refresh token from response (adjust based on your API response structure)
+      const refreshToken = data.refreshToken || "default-refresh-token";
+      login(data.user, data.token, refreshToken);
       navigate("/dashboard");
     } catch (err) {
       alert("Registration failed");

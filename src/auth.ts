@@ -1,14 +1,23 @@
 // src/api/auth.ts
-import axios from "axios"
-
-const BASE_URL = "https://lendpool-api-web.onrender.com"
+import { publicApi } from "./lib/axios"
 
 export const login = async (email: string, password: string) => {
-  const response = await axios.post(`${BASE_URL}/lendpool/api/v1/login`, {
-    email,
-    password,
-  })
-  return response.data
+  try {
+    // Try the auth/login endpoint first
+    const response = await publicApi.post(`/auth/login`, {
+      email,
+      password,
+    })
+    return response.data
+  } catch (error) {
+    console.log("Auth/login failed, trying /login...");
+    // Fallback to /login endpoint
+    const response = await publicApi.post(`/login`, {
+      email,
+      password,
+    })
+    return response.data
+  }
 }
 
 export const register = async (
@@ -18,7 +27,7 @@ export const register = async (
   password: string,
   role: "Lender" | "Borrower"
 ) => {
-  const response = await axios.post(`${BASE_URL}/lendpool/api/v1/register`, {
+  const response = await publicApi.post(`/auth/register`, {
     firstName,
     lastName,
     email,

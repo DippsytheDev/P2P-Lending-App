@@ -11,7 +11,7 @@ import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Label } from "../components/ui/label";
-import axios from "axios";
+import api from "../lib/axios";
 import { useAuth } from "../context/AuthContext";
 import {
   BarChart2,
@@ -53,12 +53,6 @@ interface BorrowerMetrics {
   nextPayment: string;
 }
 
-interface RepaymentHistory {
-  date: string;
-  amount: number;
-  status: string;
-}
-
 interface Notification {
   user: string;
   text: string;
@@ -69,6 +63,24 @@ interface Notification {
 interface AccountManager {
   name: string;
   avatar: string;
+}
+
+interface WalletTransaction {
+  id: string;
+  type: string;
+  amount: number;
+  description: string;
+  date: string;
+  status: string;
+}
+
+interface Loan {
+  id: string;
+  amount: number;
+  status: string;
+  purpose: string;
+  dateCreated: string;
+  dueDate: string;
 }
 
 const sidebarMenu = [
@@ -102,24 +114,31 @@ export default function BorrowerDashboard() {
   const [loadingLoans, setLoadingLoans] = useState(false);
   const [loanError, setLoanError] = useState<string | null>(null);
 
+  // State for wallet balance
+  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [loadingWallet, setLoadingWallet] = useState(false);
+  const [walletError, setWalletError] = useState<string | null>(null);
+
+  // State for wallet transactions
+  const [walletTransactions, setWalletTransactions] = useState<WalletTransaction[]>([]);
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
+  const [transactionsError, setTransactionsError] = useState<string | null>(null);
+
+  // State for current loans
+  const [currentLoans, setCurrentLoans] = useState<Loan[]>([]);
+  const [loadingCurrentLoans, setLoadingCurrentLoans] = useState(false);
+  const [currentLoansError, setCurrentLoansError] = useState<string | null>(null);
+
   // Mock data for metrics and history
   const metricCards = [
-    { title: "Total Borrowed", value: 72000.38, sub: "" },
-    { title: "Current Loan", value: 10000.0, sub: "" },
+    { title: "Wallet Balance", value: walletBalance, sub: "" },
+    { title: "Current Loan", value: currentLoans.length > 0 ? currentLoans[0].amount : 0, sub: "" },
     { title: "Outstanding Balance", value: 9156.28, sub: "" },
     { title: "Next Payment", value: "31/06/2025", sub: "" },
   ];
   const loanByMonth = [20, 22, 25, 28, 10, 12];
   const repayByMonth = [18, 20, 23, 25, 8, 10];
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Other"];
-  const repaymentHistory = [
-    { date: "31/01/2025", amount: 10000, status: "Completed" },
-    { date: "31/01/2025", amount: 10000, status: "Completed" },
-    { date: "31/01/2025", amount: 10000, status: "Completed" },
-    { date: "31/01/2025", amount: 10000, status: "Completed" },
-    { date: "31/01/2025", amount: 10000, status: "Pending" },
-    { date: "31/01/2025", amount: 10000, status: "Pending" },
-  ];
   const notifications = [
     {
       user: "You",
@@ -167,15 +186,7 @@ export default function BorrowerDashboard() {
   useEffect(() => {
     const fetchMyPools = async () => {
       try {
-        const res = await axios.get(
-          "https://lendpool-api-web.onrender.com/lendpool/api/v1/borrower/get-all-pools",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const res = await api.get("/borrower/get-all-pools");
         setPools(res.data.data);
       } catch (err) {
         console.error("Failed to fetch pools:", err);
@@ -183,6 +194,30 @@ export default function BorrowerDashboard() {
     };
 
     fetchMyPools();
+  }, [token]);
+
+  // Fetch wallet balance
+  useEffect(() => {
+    const fetchWalletBalance = async () => {
+      if (!token) return;
+      
+      setLoadingWallet(true);
+      setWalletError(null);
+      try {
+        const res = await api.get("/wallet/balance");
+        console.log("Wallet response:", res.data);
+        // Assuming the response structure has a balance field
+        setWalletBalance(res.data.data?.balance || res.data.balance || 0);
+      } catch (err: any) {
+        console.error("Failed to fetch wallet balance:", err);
+        setWalletError("Failed to fetch wallet balance.");
+        setWalletBalance(0);
+      } finally {
+        setLoadingWallet(false);
+      }
+    };
+
+    fetchWalletBalance();
   }, [token]);
 
   // Fetch loan requests when tab is 'requests'
@@ -193,14 +228,7 @@ export default function BorrowerDashboard() {
       setLoadingLoans(true);
       setLoanError(null);
       try {
-        const res = await axios.get(
-          "https://lendpool-api-web.onrender.com/lendpool/api/v1/loan/my-requests",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const res = await api.get("/loan/my-requests");
         console.log("Loan requests response:", res.data);
         setLoanRequests(res.data.data || []);
       } catch (err: any) {
@@ -217,6 +245,52 @@ export default function BorrowerDashboard() {
     }
   }, [activeMenu, applyTab, token]);
 
+  // Fetch wallet transactions
+  useEffect(() => {
+    const fetchWalletTransactions = async () => {
+      if (!token) return;
+      
+      setLoadingTransactions(true);
+      setTransactionsError(null);
+      try {
+        const res = await api.get("/wallet/transactions");
+        console.log("Wallet transactions response:", res.data);
+        setWalletTransactions(res.data.data || res.data || []);
+      } catch (err: any) {
+        console.error("Failed to fetch wallet transactions:", err);
+        setTransactionsError("Failed to fetch wallet transactions.");
+        setWalletTransactions([]);
+      } finally {
+        setLoadingTransactions(false);
+      }
+    };
+
+    fetchWalletTransactions();
+  }, [token]);
+
+  // Fetch current loans
+  useEffect(() => {
+    const fetchCurrentLoans = async () => {
+      if (!token) return;
+      
+      setLoadingCurrentLoans(true);
+      setCurrentLoansError(null);
+      try {
+        const res = await api.get("/loan/my-loans");
+        console.log("Current loans response:", res.data);
+        setCurrentLoans(res.data.data || res.data || []);
+      } catch (err: any) {
+        console.error("Failed to fetch current loans:", err);
+        setCurrentLoansError("Failed to fetch current loans.");
+        setCurrentLoans([]);
+      } finally {
+        setLoadingCurrentLoans(false);
+      }
+    };
+
+    fetchCurrentLoans();
+  }, [token]);
+
   const handleLoanFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoanForm({ ...loanForm, [e.target.name]: e.target.value });
   };
@@ -225,16 +299,13 @@ export default function BorrowerDashboard() {
     if (!selectedPool) return;
     setSubmitting(true);
     try {
-      await axios.post(
-        "https://lendpool-api-web.onrender.com/lendpool/api/v1/loan/request-loan",
+      await api.post(
+        "/loan/request-loan",
         {
           requestedAmount: Number(loanForm.requestedAmount),
           purpose: loanForm.purpose,
           durationInMonths: Number(loanForm.durationInMonths),
           matchedPoolId: selectedPool.id,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
         }
       );
       window.alert("Loan request submitted!");
@@ -322,12 +393,30 @@ export default function BorrowerDashboard() {
                     {card.title}
                   </div>
                   <div className="text-[22px] font-bold text-[#1A1A1A] mb-1">
-                    {typeof card.value === "number"
-                      ? `₦${card.value.toLocaleString()}`
-                      : card.value}
+                    {card.title === "Wallet Balance" && loadingWallet ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Loading...</span>
+                      </div>
+                    ) : card.title === "Current Loan" && loadingCurrentLoans ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Loading...</span>
+                      </div>
+                    ) : typeof card.value === "number" ? (
+                      `₦${card.value.toLocaleString()}`
+                    ) : (
+                      card.value
+                    )}
                   </div>
                   {card.sub && (
                     <div className="text-[13px] text-[#B0B0B0]">{card.sub}</div>
+                  )}
+                  {card.title === "Wallet Balance" && walletError && (
+                    <div className="text-[12px] text-red-500 mt-1">{walletError}</div>
+                  )}
+                  {card.title === "Current Loan" && currentLoansError && (
+                    <div className="text-[12px] text-red-500 mt-1">{currentLoansError}</div>
                   )}
                 </div>
               ))}
@@ -397,42 +486,73 @@ export default function BorrowerDashboard() {
                 </div>
               </div>
             </div>
-            {/* Repayment History Table */}
+            {/* Wallet Transactions Table */}
             <div className="bg-white rounded-[8px] shadow-sm p-4">
               <div className="flex items-center justify-between mb-2">
                 <div className="text-[15px] font-semibold text-[#1A1A1A] flex items-center gap-2">
-                  Repayment History
+                  Wallet Transactions
+                  {loadingTransactions && <Loader2 className="w-4 h-4 animate-spin" />}
                 </div>
               </div>
-              <table className="w-full text-[14px]">
-                <thead>
-                  <tr className="text-[#888] border-b border-[#E0E0E0]">
-                    <th className="py-2 text-left font-medium">Due Dates</th>
-                    <th className="py-2 text-left font-medium">Amount Paid</th>
-                    <th className="py-2 text-left font-medium">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {repaymentHistory.map((row, i) => (
-                    <tr
-                      key={i}
-                      className="border-b border-[#F3F3F3] hover:bg-[#FAFAFA] transition"
-                    >
-                      <td className="py-3">{row.date}</td>
-                      <td className="py-3 font-semibold">
-                        ₦{row.amount.toLocaleString()}
-                      </td>
-                      <td className="py-3">
-                        <span
-                          className={`inline-block px-3 py-1 text-[13px] font-medium rounded-[20px] ${statusBadge(row.status)}`}
-                        >
-                          {row.status}
-                        </span>
-                      </td>
+              
+              {transactionsError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700">
+                  {transactionsError}
+                </div>
+              )}
+              
+              {loadingTransactions ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#4A90E2]" />
+                  <span className="ml-2 text-[#888]">Loading transactions...</span>
+                </div>
+              ) : (
+                <table className="w-full text-[14px]">
+                  <thead>
+                    <tr className="text-[#888] border-b border-[#E0E0E0]">
+                      <th className="py-2 text-left font-medium">Date</th>
+                      <th className="py-2 text-left font-medium">Type</th>
+                      <th className="py-2 text-left font-medium">Description</th>
+                      <th className="py-2 text-left font-medium">Amount</th>
+                      <th className="py-2 text-left font-medium">Status</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {walletTransactions.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-gray-500">
+                          No transactions found
+                        </td>
+                      </tr>
+                    ) : (
+                      walletTransactions.map((transaction) => (
+                        <tr
+                          key={transaction.id}
+                          className="border-b border-[#F3F3F3] hover:bg-[#FAFAFA] transition"
+                        >
+                          <td className="py-3">
+                            {transaction.date ? new Date(transaction.date).toLocaleDateString() : 'N/A'}
+                          </td>
+                          <td className="py-3">
+                            <span className="capitalize">{transaction.type || 'N/A'}</span>
+                          </td>
+                          <td className="py-3">{transaction.description || 'N/A'}</td>
+                          <td className="py-3 font-semibold">
+                            ₦{(transaction.amount || 0).toLocaleString()}
+                          </td>
+                          <td className="py-3">
+                            <span
+                              className={`inline-block px-3 py-1 text-[13px] font-medium rounded-[20px] ${statusBadge(transaction.status)}`}
+                            >
+                              {transaction.status || 'Unknown'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              )}
             </div>
           </>
         )}
@@ -676,3 +796,4 @@ export default function BorrowerDashboard() {
     </div>
   );
 }
+

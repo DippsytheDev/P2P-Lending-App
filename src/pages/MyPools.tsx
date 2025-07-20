@@ -1,6 +1,6 @@
 // pages/MyPools.tsx
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../lib/axios";
 import {
   Dialog,
   DialogTrigger,
@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 
 type Pool = {
   id: string;
@@ -34,49 +34,30 @@ export default function MyPools() {
   useEffect(() => {
     const fetchMyPools = async () => {
       try {
-        const res = await axios.get(
-          "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/get-all-pools",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const sorted = res.data.data.sort(
-          (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        setPools(sorted);
-        console.log(sorted);
-      } catch (err) {
-        console.error("Failed to fetch pools:", err);
+        const res = await api.get("/lender/get-all-pools");
+        setPools(res.data.data);
+      } catch (error) {
+        console.error("Failed to fetch pools:", error);
       }
     };
 
     fetchMyPools();
-  }, [token]);
+  }, []);
 
   const handleAddUser = async () => {
     if (!selectedPoolId || !userIdToAdd) return;
-  
+
     try {
-      const res = await axios.post(
-        "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/add-user",
-        {
-          userId: userIdToAdd,
-          poolId: selectedPoolId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      alert(`✅ User added successfully to pool`);
+      const res = await api.post("/lender/add-user", {
+        userId: userIdToAdd,
+        poolId: selectedPoolId,
+      });
+      alert("User added successfully!");
       setUserIdToAdd("");
-    } catch (err: any) {
-      console.error("Add user error:", err);
-      alert("❌ Failed to add user to pool");
+      setSelectedPoolId(null);
+    } catch (error) {
+      console.error("Failed to add user:", error);
+      alert("Failed to add user.");
     }
   };
 

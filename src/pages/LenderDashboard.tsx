@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Profile from "./Profile";
 import WalletPage from "./WalletPage";
-import axios from "axios";
+import api from "../lib/axios";
 
 // Types for API data
 interface FundedLoan {
@@ -84,14 +84,7 @@ const LenderDashboard = () => {
       setLoadingSummary(true);
       setError(null);
       try {
-        const response = await axios.get(
-          "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/summary/",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await api.get("/lender/summary/");
         setLenderSummary(response.data.data);
       } catch (err: any) {
         console.error("Failed to fetch lender summary:", err);
@@ -112,14 +105,7 @@ const LenderDashboard = () => {
       setLoadingLoans(true);
       setError(null);
       try {
-        const response = await axios.get(
-          "https://lendpool-api-web.onrender.com/lendpool/api/v1/lender/loans/",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await api.get("/lender/loans/");
         setFundedLoans(response.data.data || []);
       } catch (err: any) {
         console.error("Failed to fetch funded loans:", err);
@@ -140,14 +126,7 @@ const LenderDashboard = () => {
       setLoadingRepayments(true);
       setError(null);
       try {
-        const response = await axios.get(
-          "https://lendpool-api-web.onrender.com/api/repayments",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await api.get("/api/repayments");
         setRepayments(response.data.data || []);
       } catch (err: any) {
         console.error("Failed to fetch repayments:", err);
