@@ -27,9 +27,9 @@ export const register = async (
   password: string,
   role: "Lender" | "Borrower"
 ) => {
-  const response = await publicApi.post(`/auth/register`, {
-    firstName,
-    lastName,
+  const response = await publicApi.post(`/register`, {
+    firstName: firstName.trim(),
+    lastName: lastName.trim(),
     email,
     password,
     role,
